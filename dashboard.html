@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - BCHD</title>
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="assets/css/layout.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="assets/font/bootstrap-icons.css">
+    <style>
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            height: 100%;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 4px 4px 6px rgba(6, 2, 2, 0.1), -4px -4px 6px rgba(6, 2, 2, 0.1);
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .recent-analysis {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .btn-view {
+            padding: 6px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sidebar-header">
+        <h2>🐔</h2>
+        <h3>CHICKEN HEALTH DETECTOR</h3>
+      </div>
+      <hr class="my-2 mx-3">
+      <ul class="sidebar-menu">
+        <li><a href="dashboard.html"><i class="bi bi-bar-chart-fill"></i><span> Dashboard</span></a></li>
+        <li><a href="reports.html"><i class="bi bi-file-earmark-text-fill"></i><span> Reports</span></a></li>
+        <li><a href="analyze.html"><i class="bi bi-camera-fill"></i><span> Analyze</span></a></li>
+      </ul>
+      <hr class="my-2 mx-3">
+      <button id="sidebarToggle"><i class="bi bi-chevron-left"></i></button>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="mainContent">
+      <header>
+        <h2>Dashboard</h2>
+      </header>
+
+        <!-- Statistics Cards -->
+        <div class="row g-4 mb-4 justify-content-center align-items-stretch">
+            <div class="col-md-4">
+                <div class="stat-card" onclick="window.location.href='reports.html'">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="h3 mb-0" id="healthyCount">0</div>
+                            <div class="text-muted">Healthy</div>
+                        </div>
+                        <div class="icon-box icon-green">
+                            <i class="bi bi-heart-pulse"></i>
+                        </div>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" id="healthyProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card" onclick="window.location.href='reports.html'">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="h3 mb-0" id="birdFluCount">0</div>
+                            <div class="text-muted">Suspected Bird Flu</div>
+                        </div>
+                        <div class="icon-box icon-red">
+                            <i class="bi bi-virus"></i>
+                        </div>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-danger" id="birdFluProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card" onclick="window.location.href='reports.html'">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="h3 mb-0" id="totalCount">0</div>
+                            <div class="text-muted">Total Analysis</div>
+                        </div>
+                        <div class="icon-box icon-blue">
+                            <i class="bi bi-clipboard-data"></i>
+                        </div>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-primary" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="row mb-4 justify-content-center">
+            <div class="col-md-8">
+                <div class="chart-card">
+                    <h5>Health Overview</h5>
+                    <div class="chart-container">
+                        <canvas id="healthChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="chart-card">
+                    <h5>Distribution</h5>
+                    <div class="chart-container">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Alerts -->
+        <div class="recent-analysis">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0">Recent Alerts</h5>
+                <a href="reports.html" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Chicken ID</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="alertsTable">
+                        <!-- Alerts will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/chart.min.js"></script>
+    <script src="assets/js/details-modal.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

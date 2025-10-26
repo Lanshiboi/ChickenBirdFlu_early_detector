@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyze - BCHD</title>
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="assets/css/layout.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --success-color: #10B981;
+            --error-color: #dc3545;
+        }
+
+        .upload-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .upload-area {
+            border: 2px dashed var(--primary-color);
+            border-radius: 8px;
+            padding: 40px;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-area:hover {
+            background-color: #f8f9fa;
+        }
+
+        .upload-preview {
+            max-width: 300px;
+            max-height: 300px;
+            margin: 20px auto;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .btn-analyze {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            margin-bottom: 10px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .btn-save {
+            background-color: #10B981;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: 500;
+            display: none;
+        }
+
+        .btn-analyze:hover,
+        .btn-save:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-analyze:disabled,
+        .btn-save:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            display: none;
+        }
+
+        .save-success {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background-color: #10B981;
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .upload-placeholder {
+            text-align: center;
+        }
+
+        .upload-placeholder.hidden {
+            display: none;
+        }
+
+        /* Enhanced Tab Styling */
+        .nav-tabs .nav-link {
+            border: none;
+            color: #6c757d;
+            font-weight: 500;
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tabs .nav-link:hover {
+            background-color: #f8f9fa;
+            color: var(--primary-color);
+        }
+
+        .nav-tabs .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .nav-tabs .nav-link i {
+            font-size: 1.1em;
+        }
+
+        .tab-content {
+            background: white;
+            border-radius: 0 8px 8px 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .tab-pane {
+            padding: 20px;
+        }
+
+        /* Card enhancements */
+        .card {
+            border: none;
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        /* Status badge styling */
+        .status-healthy {
+            color: var(--success-color) !important;
+        }
+
+        .status-infected {
+            color: var(--error-color) !important;
+        }
+
+        /* Temperature display enhancement */
+        #headTemperature, #bodyTemperature {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* Results list styling */
+        #resultsList li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        #resultsList li:last-child {
+            border-bottom: none;
+        }
+
+        #resultsList .bi {
+            font-size: 1.1em;
+        }
+
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            .nav-tabs .nav-link {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+
+            .tab-pane {
+                padding: 15px;
+            }
+
+            .card-body {
+                padding: 15px;
+            }
+
+            .result-container {
+                padding: 15px;
+            }
+        }
+
+        /* Loading animation for images */
+        .img-fluid {
+            transition: opacity 0.3s ease;
+        }
+
+        .img-fluid[src=""] {
+            opacity: 0.5;
+        }
+
+        /* Enhanced button styling */
+        .btn-analyze, .btn-save {
+            transition: all 0.3s ease;
+        }
+
+        .btn-analyze:hover, .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Success notification enhancement */
+        .save-success {
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Loading Overlay */
+        #loadingOverlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: #495057;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(0,123,255,0.3);
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 10px;
+            font-weight: 500;
+            color: #007bff;
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+          <h2>🐔</h2>
+          <h3>CHICKEN HEALTH DETECTOR</h3>
+        </div>
+        <hr class="my-2 mx-3">
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i class="fas fa-chart-pie"></i><span>Dashboard</span></a></li>
+            <li><a href="reports.html"><i class="fas fa-file-alt"></i><span>Reports</span></a></li>
+            <li><a href="analyze.html"><i class="fas fa-camera"></i><span>Analyze</span></a></li>
+        </ul>
+        <hr class="my-2 mx-3">
+        <button id="sidebarToggle"><i class="fas fa-angle-left"></i></button>
+    </nav>
+  
+    <!-- Save Success Notification -->
+    <div class="save-success" id="saveNotification">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        Analysis saved successfully!
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Please wait...</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="mainContent">
+        <header>
+          <h2>Analyze Chicken Health</h2>
+        </header>
+        
+        <!-- Upload Section -->
+        <div class="upload-container">
+            <h4>Upload Chicken Image</h4>
+
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-placeholder" id="uploadPlaceholder">
+                    <i class="bi bi-cloud-upload fs-1 text-primary"></i>
+                    <p class="mt-3 mb-1">Click to upload or drag and drop</p>
+                    <p class="text-muted small">Supported formats: JPG, PNG</p>
+                </div>
+                <img src="" alt="Preview" class="upload-preview" id="imagePreview">
+                <input type="file" id="fileInput" hidden accept="image/*">
+            </div>
+            <div class="analyze-cancel-container">
+                <button id="analyzeBtn">Analyze</button>
+                <button id="cancelBtn">Cancel</button>
+              </div>
+              
+            <button class="btn btn-save" id="saveBtn">
+                <i class="bi bi-save me-2"></i>
+                Save Analysis
+            </button>
+        </div>
+
+        <!-- Results Section -->
+        <div class="result-container" id="resultContainer">
+            <h4 class="mb-4">Analysis Result</h4>
+
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-tabs" id="analysisTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="images-tab" data-bs-toggle="tab" data-bs-target="#imagesTab" type="button" role="tab">
+                        <i class="bi bi-image me-2"></i> Images
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="results-tab" data-bs-toggle="tab" data-bs-target="#resultsTab" type="button" role="tab">
+                        <i class="bi bi-clipboard-data me-2"></i> Results
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tabs Content -->
+            <div class="tab-content mt-3" id="analysisTabsContent">
+                <!-- Images Tab -->
+                <div class="tab-pane fade show active" id="imagesTab" role="tabpanel">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">Analyzed Image</h5>
+                                    <img src="" alt="Analyzed chicken" class="img-fluid rounded" id="analyzedImage">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">Heat Pattern</h5>
+                                    <img src="" alt="Heat pattern" class="img-fluid rounded" id="heatPatternImage">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Tab -->
+                <div class="tab-pane fade" id="resultsTab" role="tabpanel">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="mb-3">Chicken ID: <span id="resultChickenId"></span></h5>
+                            <h5>Status: <span class="fw-bold" id="healthStatus"></span></h5>
+                            <p class="text-muted mb-4">Analysis completed on <span id="analysisDate"></span></p>
+
+                            <h6>Detailed Results:</h6>
+                            <ol class="list-unstyled">
+                                <li class="mb-3">
+                                    <strong>Observed Signs</strong>
+                                    <ul id="resultObservedSignsList" class="mt-2">
+                                        <!-- Observed signs will be populated here -->
+                                    </ul>
+                                </li>
+                                <li class="mb-3">
+                                    <strong>Interpretation</strong>
+                                    <div id="resultInterpretationText" class="mt-2">
+                                        <!-- Interpretation will be populated here -->
+                                    </div>
+
+                                </li>
+                                <li class="mb-3">
+                                    <strong>Recommended Actions</strong>
+                                    <ul id="resultRecommendedActionsList" class="mt-2">
+                                        <!-- Recommended actions will be populated here -->
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/menu.js"></script>
+    <script src="assets/js/analyze.js"></script>
+    <script src="assets/js/details-modal.js"></script>
+    <script>
+        // Sidebar functionality
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const menuLinks = document.querySelectorAll('.sidebar-menu a');
+    const currentPage = window.location.pathname.split('/').pop();
+
+    // Highlight current page in sidebar
+    menuLinks.forEach(link => {
+        const linkPage = link.getAttribute('href').split('/').pop();
+        if (linkPage === currentPage) {
+            link.classList.add('active');
+        }
+    });
+
+    // Sidebar toggle
+    if (toggleBtn && sidebar) {
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+            
+            // Ensure active link remains visible when collapsed
+            const activeLink = document.querySelector('.sidebar-menu a.active');
+            if (activeLink && sidebar.classList.contains('collapsed')) {
+                activeLink.querySelector('span').style.display = 'block';
+            }
+        });
+    }
+
+    // Load saved state
+    const savedState = localStorage.getItem('sidebarCollapsed');
+    if (savedState === 'true') {
+        sidebar.classList.add('collapsed');
+    }
+
+    // Prevent sidebar from expanding when clicking menu items
+    menuLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            if (sidebar.classList.contains('collapsed')) {
+                e.stopPropagation();
+            }
+        });
+    });
+
+    sidebar.addEventListener('click', function(e) {
+        if (sidebar.classList.contains('collapsed') && 
+            e.target.closest('.sidebar-menu li a')) {
+            e.stopPropagation();
+        }
+    });
+
+    // Profile dropdown functionality
+    const profileBtn = document.getElementById('profileBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
+
+    if (profileBtn && profileDropdown) {
+        profileBtn.addEventListener('click', () => {
+            profileDropdown.style.display = profileDropdown.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                profileDropdown.style.display = 'none';
+            }
+        });
+    }
+
+
+
+
+</script>
+
+</body>
+</html>

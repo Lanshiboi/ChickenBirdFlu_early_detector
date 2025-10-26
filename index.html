@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Splash Screen - Chicken Health Detector</title>
+  <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+  <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(-45deg, #667eea, #764ba2, #43cea2, #185a9d);
+      background-size: 400% 400%;
+      animation: gradientBG 10s ease infinite;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+      overflow: hidden;
+      text-align: center;
+      transition: opacity 0.6s ease; /* fade effect */
+    }
+    body.fade-out { opacity: 0; }
+    .splash-container { animation: fadeIn 1.5s ease forwards; width: 80%; max-width: 400px; }
+    .logo {
+      width: 120px; height: 120px; margin-bottom: 20px; opacity: 0;
+      animation: fadeInUp 1.5s ease forwards, float 3s ease-in-out infinite;
+      animation-delay: 0.3s;
+    }
+    .title {
+      font-size: 2.2rem; font-weight: bold; margin-bottom: 10px; opacity: 0;
+      animation: fadeInUp 1.5s ease forwards; animation-delay: 1s;
+    }
+    .subtitle {
+      font-size: 1.2rem; opacity: 0.85; margin-bottom: 20px; opacity: 0;
+      animation: fadeInUp 1.5s ease forwards; animation-delay: 1.5s;
+    }
+    .progress {
+      height: 12px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.3);
+    }
+    .progress-bar {
+      background-color: #fff;
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+    /* Animations */
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="splash-container">
+    <img src="assets/img/rooster.png" alt="Rooster Logo" class="logo">
+    <h1 class="title">🐔 Chicken Health Detector</h1>
+    <p class="subtitle">Preparing application...</p>
+
+    <!-- Progress Bar -->
+    <div class="progress">
+      <div id="progress-bar" class="progress-bar"></div>
+    </div>
+
+  </div>
+
+  <script>
+    // Progress bar animation
+    let progress = 0;
+    let interval = setInterval(() => {
+      if (progress >= 100) {
+        clearInterval(interval);
+      } else {
+        progress += 2.5; // adjust speed (2.5 * 40 = 100 in ~4s)
+        document.getElementById("progress-bar").style.width = progress + "%";
+      }
+    }, 100);
+
+    // Start fade-out before redirect
+    setTimeout(function() {
+      document.body.classList.add("fade-out");
+    }, 3500);
+
+    // Redirect after fade-out
+    setTimeout(function() {
+      window.location.href = "/analyze.html";
+    }, 4000);
+  </script>
+
+</body>
+</html>
